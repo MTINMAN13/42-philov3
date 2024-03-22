@@ -65,7 +65,7 @@ run:
 		make $(NAME)
 		@clear
 		@echo "$(CLR2)--------- clean program run ---------$(DEF_COLOR)"
-		./$(NAME) 8 8000 800 800 800
+		./$(NAME) 8 800000 800 800 800
 		@echo
 		@echo
 		@echo "$(CLR2)--------- clean program run ---------$(DEF_COLOR)"

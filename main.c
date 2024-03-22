@@ -6,11 +6,13 @@
 /*   By: mman <mman@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 17:52:25 by mman              #+#    #+#             */
-/*   Updated: 2024/03/21 21:00:00 by mman             ###   ########.fr       */
+/*   Updated: 2024/03/22 20:00:07 by mman             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
+
+
 
 size_t	ft_get_current_time(void)
 {
@@ -19,6 +21,12 @@ size_t	ft_get_current_time(void)
 	if (gettimeofday(&time, NULL) == -1)
 		write(2, "gettimeofday() error\n", 22);
 	return (time.tv_sec * 1000 + time.tv_usec / 1000);
+}
+
+int	ft_stamp(t_philo *p)
+{
+	// printf("%i", (int)(ft_get_current_time() - p->data.time_start));
+	return ((int)(ft_get_current_time() - p->data.time_start));
 }
 
 void	ft_param_check(int argc, char *argv[])
@@ -70,6 +78,41 @@ int	ft_util_lfork(int position, int count)
 	return (count - 1);
 }
 
+void	ft_two(t_philo *p)
+{
+	printf("%i %i is sleeping\n", ft_stamp(p), p->id);
+	usleep((int)p->data.time_to_sleep * 1000);
+}
+
+void	ft_one(t_philo *p)
+{
+	p->state = 1;
+	ft_stamp(p);
+	printf("%i %i is eating\n", ft_stamp(p), p->id);
+	usleep(p->data.time_to_eat * 1000);
+	pthread_mutex_unlock(p->left);
+	pthread_mutex_unlock(p->right);
+	ft_two(p);
+}
+
+void	ft_three(t_philo *p)
+{
+	p->state = 3;
+	ft_stamp(p);
+	printf("%i %i is thinking\n", ft_stamp(p), p->id);
+	pthread_mutex_lock(p->left);
+	pthread_mutex_lock(p->right);
+	ft_one(p);
+}
+
+void	ft_routine(t_philo *x)
+{
+	while (1)
+	{
+		ft_three(x);
+	}
+}
+
 void	*ft_thread(void *arg)
 {
 	t_philo	*guy;
@@ -77,7 +120,8 @@ void	*ft_thread(void *arg)
 
 	guy = (t_philo *)arg;
 	id = guy->id;
-	printf("Executing Philo   %i\n", id);
+	ft_routine(guy);
+	// printf("Executing Philo   %i\n", id);
 	usleep(300);
 }
 
@@ -95,19 +139,22 @@ void	ft_exiter(int count, t_philo *philo_data, pthread_mutex_t **forks)
 void	ft_program(int count, char *argv[], pthread_mutex_t **forks)
 {
 	t_philo		*philo_data;
+	t_data		data;
 	int			buff;
 
+	data.time_to_die = atoi(argv[2]);
+	data.time_to_eat = atoi(argv[3]);
+	data.time_to_sleep = atoi(argv[4]);
+	data.max_optional_count = atoi(argv[5]);
+	data.time_start = ft_get_current_time();
 	buff = 0;
 	philo_data = malloc(sizeof(t_philo) * count);
 	while (buff < count)
 	{
+		philo_data[buff].data = data;
 		philo_data[buff].state = 3;
 		philo_data[buff].id = buff + 1;
 		philo_data[buff].eat_last = 0;
-		philo_data[buff].time_to_die = atoi(argv[2]);
-		philo_data[buff].time_to_eat = atoi(argv[3]);
-		philo_data[buff].time_to_sleep = atoi(argv[4]);
-		philo_data[buff].max_optional_count = atoi(argv[5]);
 		philo_data[buff].left = forks[ft_util_lfork(buff, count)];
 		philo_data[buff].right = forks[buff % (count - 1)];
 		pthread_create(&philo_data[buff].thread, NULL,
