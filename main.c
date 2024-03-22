@@ -6,7 +6,7 @@
 /*   By: mman <mman@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 17:52:25 by mman              #+#    #+#             */
-/*   Updated: 2024/03/22 20:00:07 by mman             ###   ########.fr       */
+/*   Updated: 2024/03/22 20:06:26 by mman             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,9 +86,12 @@ void	ft_two(t_philo *p)
 
 void	ft_one(t_philo *p)
 {
+	int	i;
+
+	i = ft_stamp(p);
 	p->state = 1;
-	ft_stamp(p);
-	printf("%i %i is eating\n", ft_stamp(p), p->id);
+	p->eat_last = i;
+	printf("%i %i is eating\n", i, p->id);
 	usleep(p->data.time_to_eat * 1000);
 	pthread_mutex_unlock(p->left);
 	pthread_mutex_unlock(p->right);
@@ -98,7 +101,6 @@ void	ft_one(t_philo *p)
 void	ft_three(t_philo *p)
 {
 	p->state = 3;
-	ft_stamp(p);
 	printf("%i %i is thinking\n", ft_stamp(p), p->id);
 	pthread_mutex_lock(p->left);
 	pthread_mutex_lock(p->right);
@@ -149,6 +151,8 @@ void	ft_program(int count, char *argv[], pthread_mutex_t **forks)
 	data.time_start = ft_get_current_time();
 	buff = 0;
 	philo_data = malloc(sizeof(t_philo) * count);
+	// death checker -- time since last eat, loops through all philos and makes calculations all the time. stops program when it finds (stamp - eat_last) > time_to_die
+	pthread_create()
 	while (buff < count)
 	{
 		philo_data[buff].data = data;
