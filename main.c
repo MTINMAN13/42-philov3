@@ -6,7 +6,7 @@
 /*   By: mman <mman@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 17:52:25 by mman              #+#    #+#             */
-/*   Updated: 2024/03/22 20:06:26 by mman             ###   ########.fr       */
+/*   Updated: 2024/03/23 19:38:08 by mman             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,14 @@ int	ft_stamp(t_philo *p)
 
 void	ft_param_check(int argc, char *argv[])
 {
+	int	count;
+
+	count = atoi(argv[1]);
+	if (count >= 10)
+	{
+		printf("please only 2 - 9 philosophers, thanks.");
+		exit(EXIT_SUCCESS);
+	}
 	if (argc == 5)
 	{
 		atoi(argv[1]);
@@ -91,6 +99,7 @@ void	ft_one(t_philo *p)
 	i = ft_stamp(p);
 	p->state = 1;
 	p->eat_last = i;
+	p->eat_current_count += 1;
 	printf("%i %i is eating\n", i, p->id);
 	usleep(p->data.time_to_eat * 1000);
 	pthread_mutex_unlock(p->left);
@@ -127,6 +136,26 @@ void	*ft_thread(void *arg)
 	usleep(300);
 }
 
+void	*ft_deaththread(void *arg)
+{
+	t_philo	*guy;
+	int		id;
+
+	guy = (t_philo *)arg;
+	id = guy->id;
+	while (guy->state != 0)
+	{
+		if (ft_stamp(guy) - guy->eat_last >= guy->data.time_to_die)
+		{
+			printf("%i %i died\n", ft_stamp(guy), guy->id);
+			guy->state = 0;
+			exit(EXIT_SUCCESS);
+		}
+		if (guy->eat_current_count == guy->data.max_optional_count)
+			exit(EXIT_SUCCESS);
+	}
+}
+
 void	ft_cleanup(t_philo *philo_data)
 {
 	free(philo_data);
@@ -138,31 +167,36 @@ void	ft_exiter(int count, t_philo *philo_data, pthread_mutex_t **forks)
 	ft_mutex_destroy(forks, count);
 }
 
-void	ft_program(int count, char *argv[], pthread_mutex_t **forks)
+void	ft_program(int count, int argc, char *argv[], pthread_mutex_t **forks)
 {
 	t_philo		*philo_data;
+	pthread_t	checker;
 	t_data		data;
 	int			buff;
 
 	data.time_to_die = atoi(argv[2]);
 	data.time_to_eat = atoi(argv[3]);
 	data.time_to_sleep = atoi(argv[4]);
-	data.max_optional_count = atoi(argv[5]);
+	if (argc == 6)
+		data.max_optional_count = atoi(argv[5]);
+	else
+		data.max_optional_count = -1;
 	data.time_start = ft_get_current_time();
 	buff = 0;
 	philo_data = malloc(sizeof(t_philo) * count);
-	// death checker -- time since last eat, loops through all philos and makes calculations all the time. stops program when it finds (stamp - eat_last) > time_to_die
-	pthread_create()
 	while (buff < count)
 	{
 		philo_data[buff].data = data;
 		philo_data[buff].state = 3;
 		philo_data[buff].id = buff + 1;
 		philo_data[buff].eat_last = 0;
+		philo_data[buff].eat_current_count = 0;
 		philo_data[buff].left = forks[ft_util_lfork(buff, count)];
 		philo_data[buff].right = forks[buff % (count - 1)];
 		pthread_create(&philo_data[buff].thread, NULL,
 			ft_thread, &philo_data[buff]);
+		pthread_create(&philo_data[buff].death, NULL,
+			ft_deaththread, &philo_data[buff]);
 		// // create a thread
 		// printf("this was %i\n", buff);
 		// printf("id was %i\n", philo_data[buff].id);
@@ -190,7 +224,7 @@ int	main(int argc, char *argv[])
 	ft_param_check(argc, argv);
 	philo_count = atoi(argv[1]);
 	ft_mutex_init(forks, philo_count);
-	ft_program(philo_count, argv, forks);
+	ft_program(philo_count, argc, argv, forks);
 	ft_mutex_destroy(forks, philo_count);
 	printf("\nClean Exit 0\n");
 	return (EXIT_SUCCESS);

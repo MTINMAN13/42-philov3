@@ -6,7 +6,7 @@
 /*   By: mman <mman@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 18:06:34 by mman              #+#    #+#             */
-/*   Updated: 2024/03/22 19:46:20 by mman             ###   ########.fr       */
+/*   Updated: 2024/03/23 19:33:45 by mman             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # include <stdbool.h>
 
 
-# define MAX_PHILOSOPHERS 9
+# define MAX_PHILOSOPHERS 900
 
 typedef struct s_data
 {
@@ -40,6 +40,7 @@ typedef struct s_philo
 	int				id;
 	size_t			eat_last;
 	pthread_t		thread;
+	pthread_t		death;
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
@@ -47,6 +48,7 @@ typedef struct s_philo
 	int				eat_current_count;
 	pthread_mutex_t	*left;
 	pthread_mutex_t	*right;
+	pthread_mutex_t	**forks;
 	t_data			data;
 }	t_philo;
 
