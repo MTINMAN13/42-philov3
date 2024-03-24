@@ -6,7 +6,7 @@
 /*   By: mman <mman@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 18:06:34 by mman              #+#    #+#             */
-/*   Updated: 2024/03/24 19:03:40 by mman             ###   ########.fr       */
+/*   Updated: 2024/03/24 19:14:58 by mman             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,5 +64,6 @@ void	ft_three(t_philo *p);
 void	*ft_thread(void *arg);
 void	*ft_deaththread(void *arg);
 void	ft_program(int count, int argc, char *argv[], pthread_mutex_t **forks);
+int		ft_isnum(const char *str);
 
 #endif
