@@ -6,7 +6,7 @@
 /*   By: mman <mman@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 18:06:34 by mman              #+#    #+#             */
-/*   Updated: 2024/03/23 19:33:45 by mman             ###   ########.fr       */
+/*   Updated: 2024/03/24 19:14:58 by mman             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ typedef struct s_data
 
 typedef struct s_philo
 {
-	int				state;  // 1 is eating // 2 is sleeping // 3 is thinking // 0 is dead
+	int				state;
 	int				id;
 	size_t			eat_last;
 	pthread_t		thread;
@@ -51,5 +51,19 @@ typedef struct s_philo
 	pthread_mutex_t	**forks;
 	t_data			data;
 }	t_philo;
+
+size_t	ft_get_current_time(void);
+int		ft_stamp(t_philo *p);
+int		ft_util_lfork(int position, int count);
+void	ft_param_check(int argc, char *argv[]);
+void	ft_mutex_init(pthread_mutex_t **forks, int count);
+void	ft_mutex_destroy(pthread_mutex_t **forks, int count);
+void	ft_one(t_philo *p);
+void	ft_two(t_philo *p);
+void	ft_three(t_philo *p);
+void	*ft_thread(void *arg);
+void	*ft_deaththread(void *arg);
+void	ft_program(int count, int argc, char *argv[], pthread_mutex_t **forks);
+int		ft_isnum(const char *str);
 
 #endif

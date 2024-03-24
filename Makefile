@@ -17,7 +17,7 @@ OBJ_DIR = obj
 INCLUDE = include
 
 # Sources
-SRC_FILES = main
+SRC_FILES = main mutex stamp states thread utils
 
 SRC = $(addsuffix .c, $(SRC_FILES))
 OBJ = $(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(SRC_FILES)))
@@ -65,7 +65,7 @@ run:
 		make $(NAME)
 		@clear
 		@echo "$(CLR2)--------- clean program run ---------$(DEF_COLOR)"
-		./$(NAME) 16 800 80 80 64
+		./$(NAME) 6 800 80 80 20
 		@echo
 		@echo
 		@echo "$(CLR2)--------- clean program run ---------$(DEF_COLOR)"
